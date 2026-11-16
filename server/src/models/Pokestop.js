@@ -20,8 +20,11 @@ const {
 } = require('../utils/evalScannerQuery')
 const { filterRTree } = require('../utils/filterRTree')
 const {
+  GIOVANNI_CHARACTER,
+  GIOVANNI_DECOY_CHARACTERS,
   ROCKET_POKEMON_FILTER_EXCLUDED_CHARACTERS,
   getEnabledRocketPokemonSpecies,
+  getInvasionFilterCharacters,
   getRocketPokemonFilterKey,
   isRocketPokemonFilterExcluded,
 } = require('../utils/rocketPokemonFiltering')
@@ -199,6 +202,20 @@ const invasionHasMatchingRocketPokemon = (gruntType, pokemonIds) =>
       state.event.invasions[gruntType]?.encounters[name]?.some((pokemon) =>
         pokemonIds.includes(pokemon.id),
       ),
+  )
+
+/**
+ * The Exclude Grunts / Exclude Leaders toggles switch their characters'
+ * invasion filters off.
+ * @param {number} character
+ * @param {{ onlyExcludeGrunts?: boolean, onlyExcludeLeaders?: boolean }} filters
+ */
+const isInvasionCharacterExcluded = (character, filters) =>
+  !!(
+    (filters.onlyExcludeGrunts &&
+      state.event.rocketGruntIDs.includes(character)) ||
+    (filters.onlyExcludeLeaders &&
+      state.event.rocketLeaderIDs.includes(character))
   )
 
 /**
@@ -706,7 +723,25 @@ class Pokestop extends Model {
           })
         }
         if (onlyInvasions && invasionPerms) {
+          // An unconfirmed Giovanni may be a disguised Decoy, so a Decoy
+          // filter left on by the exclusion toggles admits it on its own.
+          const decoyAdmitsGiovanni = GIOVANNI_DECOY_CHARACTERS.some(
+            (character) =>
+              filters[`i${character}`] &&
+              !isInvasionCharacterExcluded(character, filters),
+          )
           if (hasMultiInvasions) {
+            const whereUnconfirmedGiovanni = (giovanni) => {
+              giovanni.where('character', GIOVANNI_CHARACTER)
+              if (hasConfirmed)
+                giovanni.andWhere((confirmation) => {
+                  confirmation.where('confirmed', 0).orWhereNull('confirmed')
+                })
+            }
+            const excludedCharacters = [
+              ...(onlyExcludeGrunts ? state.event.rocketGruntIDs : []),
+              ...(onlyExcludeLeaders ? state.event.rocketLeaderIDs : []),
+            ]
             stops.orWhere((invasion) => {
               invasion.andWhere(
                 multiInvasionMs ? 'expiration_ms' : 'expiration',
@@ -719,6 +754,8 @@ class Pokestop extends Model {
               invasion.andWhere((subQuery) => {
                 // Case (a): Include if the invasion character/grunt type is checked
                 subQuery.whereIn('character', invasions)
+                if (decoyAdmitsGiovanni)
+                  subQuery.orWhere(whereUnconfirmedGiovanni)
 
                 // Case (b): Include if invasion has potential rewards that are checked
                 if (rocketPokemon.length) {
@@ -783,12 +820,12 @@ class Pokestop extends Model {
                   }
                 }
               })
-              if (onlyExcludeGrunts) {
-                invasion.whereNotIn('character', state.event.rocketGruntIDs)
-              }
-
-              if (onlyExcludeLeaders) {
-                invasion.whereNotIn('character', state.event.rocketLeaderIDs)
+              if (excludedCharacters.length) {
+                invasion.andWhere((included) => {
+                  included.whereNotIn('character', excludedCharacters)
+                  if (decoyAdmitsGiovanni)
+                    included.orWhere(whereUnconfirmedGiovanni)
+                })
               }
             })
           } else {
@@ -807,7 +844,11 @@ class Pokestop extends Model {
                 // Use event-info grunt candidates as a safe SQL superset and
                 // let secondaryFilter apply the exact Rocket reward filter.
                 .whereIn('grunt_type', [
-                  ...new Set([...invasions, ...matchingGrunts]),
+                  ...new Set([
+                    ...invasions,
+                    ...matchingGrunts,
+                    ...(decoyAdmitsGiovanni ? [`${GIOVANNI_CHARACTER}`] : []),
+                  ]),
                 ])
                 .andWhere('incident_expire_timestamp', '>=', ts)
               if (hasConfirmed) {
@@ -1045,18 +1086,11 @@ class Pokestop extends Model {
     if (hasConfirmed && filters.onlyConfirmed && !invasion.confirmed) {
       return false
     }
-    if (
-      filters.onlyExcludeGrunts &&
-      state.event.rocketGruntIDs.includes(gruntType)
-    ) {
-      return false
-    }
-    if (
-      filters.onlyExcludeLeaders &&
-      state.event.rocketLeaderIDs.includes(gruntType)
-    ) {
-      return false
-    }
+    const characters = getInvasionFilterCharacters(
+      gruntType,
+      invasion.confirmed,
+    ).filter((character) => !isInvasionCharacterExcluded(character, filters))
+    if (!characters.length) return false
     if (
       !isRocketPokemonFilterExcluded(gruntType) &&
       ROCKET_REWARD_POSITIONS.some(({ name, enabled, pokemonId, form }) => {
@@ -1089,7 +1123,7 @@ class Pokestop extends Model {
     }
 
     return !!(
-      filters[`i${gruntType}`] ||
+      characters.some((character) => filters[`i${character}`]) ||
       (filters.onlyAllPokestops &&
         (filters.onlyConfirmed ? invasion.confirmed : true))
     )
@@ -1709,6 +1743,8 @@ class Pokestop extends Model {
     // pokemon
 
     // invasions
+    // `confirmed` tells an unconfirmed Giovanni (which also answers to the
+    // Decoy filters) apart from a confirmed one.
     if (hasMultiInvasions) {
       queries.invasions = this.query()
         .leftJoin('incident', 'pokestop.id', 'incident.pokestop_id')
@@ -1720,9 +1756,13 @@ class Pokestop extends Model {
         )
         .groupBy('incident.character', 'incident.display_type')
         .orderBy('incident.character', 'incident.display_type')
+      if (hasConfirmed)
+        queries.invasions
+          .select('incident.confirmed')
+          .groupBy('incident.confirmed')
     } else {
       queries.invasions = this.query()
-        .distinct('grunt_type')
+        .distinct('grunt_type', ...(hasConfirmed ? ['confirmed'] : []))
         .where('grunt_type', '>', 0)
         .andWhere('incident_expire_timestamp', '>=', ts)
         .orderBy('grunt_type')
@@ -1902,11 +1942,16 @@ class Pokestop extends Model {
           rewards.forEach((reward) => finalList.add(`l${reward.lure_id}`))
           break
         case 'invasions':
-          rewards.forEach((reward) =>
-            reward.grunt_type
-              ? finalList.add(`i${reward.grunt_type}`)
-              : finalList.add(`b${reward.display_type}`),
-          )
+          rewards.forEach((reward) => {
+            if (reward.grunt_type) {
+              getInvasionFilterCharacters(
+                reward.grunt_type,
+                reward.confirmed,
+              ).forEach((character) => finalList.add(`i${character}`))
+            } else {
+              finalList.add(`b${reward.display_type}`)
+            }
+          })
           break
         case 'rocketPokemon':
           if (hasConfirmed) {

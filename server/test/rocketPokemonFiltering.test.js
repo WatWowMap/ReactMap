@@ -7,6 +7,7 @@ const config = require('@rm/config')
 
 const { state } = require('./stateMock')
 const { buildPokestops } = require('../src/filters/builder/pokestop')
+const { buildPokestopDnfFilters } = require('../src/filters/fort/pokestop')
 const { Pokestop } = require('../src/models/Pokestop')
 const {
   mapAvailablePokestops,
@@ -197,6 +198,166 @@ test('Rocket Pokemon filters continue to match ordinary grunts', () => {
     ),
     true,
   )
+})
+
+test('unconfirmed Giovanni answers to the Giovanni and female Decoy filters', () => {
+  const unconfirmed = { grunt_type: 44, confirmed: false }
+  const confirmed = { grunt_type: 44, confirmed: true }
+  const matches = (invasion, filters, hasConfirmed = true) =>
+    Pokestop.invasionMatchesFilters(invasion, filters, hasConfirmed)
+
+  assert.equal(matches(unconfirmed, { i44: true }), true)
+  assert.equal(matches(unconfirmed, { i46: true }), true)
+  assert.equal(matches(unconfirmed, { i45: true }), false)
+  assert.equal(matches(confirmed, { i44: true }), true)
+  assert.equal(matches(confirmed, { i46: true }), false)
+  // Sources without a confirmed column never confirm Giovanni.
+  assert.equal(matches({ grunt_type: 44 }, { i46: true }, false), true)
+  assert.equal(matches(unconfirmed, { i46: true, onlyConfirmed: true }), false)
+})
+
+test('exclusion toggles hide unconfirmed Giovanni only when both readings are off', () => {
+  const unconfirmed = { grunt_type: 44, confirmed: false }
+  const matches = (filters) =>
+    Pokestop.invasionMatchesFilters(unconfirmed, filters, true)
+  const both = { i44: true, i46: true }
+
+  assert.equal(matches({ ...both, onlyExcludeLeaders: true }), true)
+  assert.equal(matches({ ...both, onlyExcludeGrunts: true }), true)
+  assert.equal(
+    matches({ ...both, onlyExcludeGrunts: true, onlyExcludeLeaders: true }),
+    false,
+  )
+  assert.equal(matches({ i44: true, onlyExcludeLeaders: true }), false)
+  assert.equal(matches({ i46: true, onlyExcludeGrunts: true }), false)
+  assert.equal(
+    matches({ onlyAllPokestops: true, onlyExcludeLeaders: true }),
+    true,
+  )
+  assert.equal(
+    matches({
+      onlyAllPokestops: true,
+      onlyExcludeGrunts: true,
+      onlyExcludeLeaders: true,
+    }),
+    false,
+  )
+  assert.equal(
+    Pokestop.invasionMatchesFilters(
+      { grunt_type: 44, confirmed: true },
+      { ...both, onlyExcludeLeaders: true },
+      true,
+    ),
+    false,
+  )
+})
+
+test('Golbat prefilter requests Giovanni for a surviving female Decoy filter', () => {
+  const characters = (filters) =>
+    buildPokestopDnfFilters({ onlyInvasions: true, ...filters }, invasions)
+      .find((clause) => clause.incident_character)
+      ?.incident_character.sort((a, b) => a - b)
+
+  assert.deepEqual(characters({ i46: true }), [44, 46])
+  assert.deepEqual(characters({ i45: true }), [45])
+  assert.deepEqual(
+    characters({ i46: true, onlyExcludeLeaders: true }),
+    [44, 46],
+  )
+  assert.equal(characters({ i46: true, onlyExcludeGrunts: true }), undefined)
+})
+
+/**
+ * @param {Record<string, unknown>} filters
+ * @param {{ hasMultiInvasions: boolean, hasConfirmed: boolean }} schema
+ */
+const getInvasionSql = async (filters, schema) => {
+  const previousQuery = Pokestop.query
+  const previousGetSafe = config.getSafe
+  const knex = knexFactory({ client: 'mysql2' })
+  try {
+    config.getSafe = (key) => {
+      if (key === 'areas') return { polygons: {} }
+      if (key === 'authentication') {
+        return { strictAreaRestrictions: false, areaRestrictions: [] }
+      }
+      return previousGetSafe.call(config, key)
+    }
+    const query = knex('pokestop')
+    query.then = (resolve, reject) => Promise.resolve([]).then(resolve, reject)
+    Pokestop.query = () => query
+
+    await Pokestop.getAll(
+      {
+        lures: false,
+        quests: false,
+        invasions: true,
+        pokestops: false,
+        eventStops: false,
+        areaRestrictions: [],
+      },
+      {
+        minLat: 51,
+        minLon: 0,
+        maxLat: 52,
+        maxLon: 1,
+        filters: {
+          onlyLevels: 'all',
+          onlyInvasions: true,
+          onlyConfirmed: false,
+          onlyAreas: [],
+          ...filters,
+        },
+      },
+      {
+        hasAltQuests: false,
+        multiInvasionMs: false,
+        hasRewardAmount: true,
+        hasPowerUp: false,
+        ...schema,
+      },
+    )
+    return query.toSQL()
+  } finally {
+    Pokestop.query = previousQuery
+    config.getSafe = previousGetSafe
+    await knex.destroy()
+  }
+}
+
+test('SQL prefilter admits unconfirmed Giovanni for a surviving female Decoy filter', async () => {
+  const multi = { hasMultiInvasions: true, hasConfirmed: true }
+  const unconfirmedGiovanni =
+    /\(`character` = \? and \(`confirmed` = \? or `confirmed` is null\)\)/
+
+  const admitted = await getInvasionSql(
+    { i46: true, onlyExcludeLeaders: true },
+    multi,
+  )
+  assert.match(
+    admitted.sql,
+    new RegExp(`\`character\` in \\(\\?\\) or ${unconfirmedGiovanni.source}`),
+  )
+  assert.match(
+    admitted.sql,
+    new RegExp(
+      `\`character\` not in \\(\\?\\) or ${unconfirmedGiovanni.source}`,
+    ),
+  )
+
+  const excluded = await getInvasionSql(
+    { i46: true, onlyExcludeGrunts: true },
+    multi,
+  )
+  assert.doesNotMatch(excluded.sql, unconfirmedGiovanni)
+  assert.match(excluded.sql, /`character` not in \(\?, \?, \?\)/)
+
+  const legacy = await getInvasionSql(
+    { i46: true },
+    { hasMultiInvasions: false, hasConfirmed: false },
+  )
+  assert.match(legacy.sql, /`grunt_type` in \(\?, \?\)/)
+  assert.equal(legacy.bindings.includes('44'), true)
 })
 
 test('confirmed partial lineups fall back only for missing reward slots', (t) => {
@@ -468,6 +629,100 @@ test('available mapper distinguishes unknown and explicit zero forms', () => {
   assert.equal(available.includes('a19-0'), true)
   assert.equal(available.includes('a20'), true)
   assert.equal(available.includes('a20-0'), false)
+})
+
+test('available mapper lists the female Decoy filter for unconfirmed Giovanni', () => {
+  const invasionKeys = (invasion) =>
+    mapAvailablePokestops(
+      {
+        showcase_focus_filter: true,
+        invasions: [{ character: 44, display_type: 1, ...invasion }],
+      },
+      { invasions },
+    )
+      .available.filter((key) => key.startsWith('i'))
+      .sort()
+
+  assert.deepEqual(invasionKeys({ confirmed: false }), ['i44', 'i46'])
+  assert.deepEqual(invasionKeys({}), ['i44', 'i46'])
+  assert.deepEqual(invasionKeys({ confirmed: true }), ['i44'])
+})
+
+test('SQL availability lists the female Decoy filter for unconfirmed Giovanni', async (t) => {
+  const previousQuery = Pokestop.query
+  const knex = knexFactory({ client: 'mysql2' })
+  let invasionRows = []
+  let invasionSql = ''
+
+  t.after(async () => {
+    Pokestop.query = previousQuery
+    await knex.destroy()
+  })
+
+  Pokestop.query = () => {
+    const query = knex('pokestop')
+    query.then = (resolve, reject) => {
+      const { sql } = query.toSQL()
+      const isInvasions =
+        sql.includes('`grunt_type`') && !sql.includes('slot_1_pokemon_id')
+      if (isInvasions) invasionSql = sql
+      return Promise.resolve(isInvasions ? invasionRows : []).then(
+        resolve,
+        reject,
+      )
+    }
+    return query
+  }
+
+  const context = {
+    hasAltQuests: false,
+    hasMultiInvasions: true,
+    multiInvasionMs: false,
+    hasRewardAmount: true,
+    hasConfirmed: true,
+    hasShowcaseData: false,
+    hasShowcaseForm: false,
+    hasShowcaseType: false,
+    hasShowcaseFocus: false,
+  }
+  const invasionKeys = async (rows, schema) => {
+    invasionRows = rows
+    const { available } = await Pokestop.getAvailable({
+      ...context,
+      ...schema,
+    })
+    return available.filter((key) => key.startsWith('i')).sort()
+  }
+
+  assert.deepEqual(
+    await invasionKeys([{ grunt_type: 44, display_type: 1, confirmed: 0 }]),
+    ['i44', 'i46'],
+  )
+  assert.match(
+    invasionSql,
+    /group by `incident`\.`character`, `incident`\.`display_type`, `incident`\.`confirmed`/,
+  )
+  assert.deepEqual(
+    await invasionKeys([{ grunt_type: 44, display_type: 1, confirmed: 1 }]),
+    ['i44'],
+  )
+
+  assert.deepEqual(
+    await invasionKeys([{ grunt_type: 44, confirmed: 1 }], {
+      hasMultiInvasions: false,
+    }),
+    ['i44'],
+  )
+  assert.match(invasionSql, /select distinct `grunt_type`, `confirmed`/)
+
+  assert.deepEqual(
+    await invasionKeys([{ grunt_type: 44 }], {
+      hasMultiInvasions: false,
+      hasConfirmed: false,
+    }),
+    ['i44', 'i46'],
+  )
+  assert.match(invasionSql, /select distinct `grunt_type` from/)
 })
 
 test('SQL availability accepts partial lineups and community-only sources', async (t) => {

@@ -1,6 +1,7 @@
 // @ts-check
 
 const excludedCharacters = require('@rm/masterfile/lib/rocketPokemonFilterExcludedCharacters.json')
+const giovanniDecoyCharacters = require('@rm/masterfile/lib/giovanniDecoyCharacters.json')
 
 // Rocket Pokemon filters apply only to standard grunts. Team leaders (41-43),
 // Giovanni (44), and Decoys (45-46) remain selectable by invasion type.
@@ -11,6 +12,24 @@ const ROCKET_POKEMON_FILTER_EXCLUDED_CHARACTERS = Object.freeze([
 /** @param {number|string|null|undefined} character */
 const isRocketPokemonFilterExcluded = (character) =>
   ROCKET_POKEMON_FILTER_EXCLUDED_CHARACTERS.includes(Number(character))
+
+const GIOVANNI_CHARACTER = 44
+// Decoys that may hide behind an unconfirmed Giovanni.
+const GIOVANNI_DECOY_CHARACTERS = Object.freeze([...giovanniDecoyCharacters])
+
+/**
+ * Invasion filter characters an incident answers to. An unconfirmed Giovanni
+ * may be a disguised Decoy, so it also answers to the Decoy filters.
+ * @param {number|string|null|undefined} character
+ * @param {unknown} confirmed
+ * @returns {number[]}
+ */
+const getInvasionFilterCharacters = (character, confirmed) => {
+  const id = Number(character)
+  return id === GIOVANNI_CHARACTER && !confirmed
+    ? [GIOVANNI_CHARACTER, ...GIOVANNI_DECOY_CHARACTERS]
+    : [id]
+}
 
 /**
  * Builds a Rocket reward filter key without inventing a form. A missing or
@@ -71,9 +90,12 @@ const getEnabledRocketPokemonSpecies = (filters) => {
 }
 
 module.exports = {
+  GIOVANNI_CHARACTER,
+  GIOVANNI_DECOY_CHARACTERS,
   ROCKET_POKEMON_FILTER_EXCLUDED_CHARACTERS,
   collapseRocketPokemonFilterKeys,
   getEnabledRocketPokemonSpecies,
+  getInvasionFilterCharacters,
   getRocketPokemonFilterKey,
   isRocketPokemonFilterExcluded,
 }

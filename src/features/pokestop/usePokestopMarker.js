@@ -9,7 +9,9 @@ import { INCIDENT_DISPLAY_TYPES } from './incidentPriority'
 import { resolveShowcaseEventIcon } from './resolveShowcaseEventIcon'
 import {
   getEnabledRocketPokemonFilterKeys,
+  getInvasionFilterGruntTypes,
   getRocketPokemonFilterKey,
+  isInvasionFilterEnabled,
   isRocketPokemonFilterExcluded,
 } from './rocketPokemonFiltering'
 
@@ -172,6 +174,14 @@ export function usePokestopMarker({
     ]
   }, basicEqualFn)
   const filters = useStorage((s) => s.filters.pokestops.filter)
+  const [excludeGrunts, excludeLeaders] = useStorage(
+    (s) => [
+      !!s.filters.pokestops.excludeGrunts,
+      !!s.filters.pokestops.excludeLeaders,
+    ],
+    basicEqualFn,
+  )
+  const invasionExclusions = { excludeGrunts, excludeLeaders }
 
   const [invasionMod, pokestopMod, rewardMod, eventMod] = Icons.getModifiers(
     'invasion',
@@ -223,11 +233,29 @@ export function usePokestopMarker({
           opacity: getOpacity(invasion.incident_expire_timestamp),
         })
 
-        // Get base invasion type icon size
-        const invasionTypeSize = Icons.getSize(
-          invasionSizeCategory,
-          filters[`i${invasion.grunt_type}`]?.size,
+        // Get base invasion type icon size. An unconfirmed Giovanni may be a
+        // Decoy, so it takes the biggest size among its enabled filters.
+        const enabledTypeSizes = getInvasionFilterGruntTypes(
+          invasion.grunt_type,
+          invasion.confirmed,
         )
+          .filter((gruntType) =>
+            isInvasionFilterEnabled(
+              gruntType,
+              filters,
+              invasionExclusions,
+              masterfile.invasions,
+            ),
+          )
+          .map((gruntType) =>
+            Icons.getSize(invasionSizeCategory, filters[`i${gruntType}`].size),
+          )
+        const invasionTypeSize = enabledTypeSizes.length
+          ? Math.max(...enabledTypeSizes)
+          : Icons.getSize(
+              invasionSizeCategory,
+              filters[`i${invasion.grunt_type}`]?.size,
+            )
 
         if (isRocketPokemonFilterExcluded(invasion.grunt_type)) {
           invasionSizes.unshift(invasionTypeSize)
