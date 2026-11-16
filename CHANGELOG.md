@@ -1,3 +1,10 @@
+## [1.58.2](https://github.com/WatWowMap/ReactMap/compare/v1.58.1...v1.58.2) (2026-11-16)
+
+
+### Bug Fixes
+
+* **pokestop:** let the Decoy filter match unconfirmed Giovanni ([0638ea2](https://github.com/WatWowMap/ReactMap/commit/0638ea28e1bb1b89d69e550cdbb237accfa4d0be))
+
 ## [1.58.1](https://github.com/WatWowMap/ReactMap/compare/v1.58.0...v1.58.1) (2026-11-11)
 
 
