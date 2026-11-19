@@ -344,10 +344,23 @@ export function PokemonPopup({ pokemon, iconUrl, isTutorial = false }) {
 const Header = ({ pokemon, metaData, iconUrl, userSettings, isTutorial }) => {
   const { t } = useTranslation()
   const filters = useStorage((s) => s.filters)
+  const Icons = useMemory((s) => s.Icons)
 
   const [anchorEl, setAnchorEl] = React.useState(null)
-  const { id, pokemon_id, form, display_pokemon_id } = pokemon
+  const { id, pokemon_id, form, display_pokemon_id, display_pokemon_form } =
+    pokemon
   const filterKey = getWildFilterId(pokemon_id, form)
+  // The marker shows what is caught; the popup shows what the game shows,
+  // such as a Ditto's disguise or a derived Minior's Meteor form.
+  const shownIconUrl = display_pokemon_id
+    ? Icons.getPokemon(
+        display_pokemon_id,
+        display_pokemon_form ?? 0,
+        0,
+        pokemon.gender,
+        pokemon.costume,
+      )
+    : iconUrl
 
   const handleClick = (event) => {
     setAnchorEl(event.currentTarget)
@@ -396,9 +409,9 @@ const Header = ({ pokemon, metaData, iconUrl, userSettings, isTutorial }) => {
           <Avatar>{metaData.pokedexId}</Avatar>
         ) : (
           <img
-            src={iconUrl}
+            src={shownIconUrl}
             style={{ maxWidth: 40, maxHeight: 40 }}
-            alt={pokemon.pokemon_id}
+            alt={display_pokemon_id || pokemon_id}
           />
         )}
       </Grid>

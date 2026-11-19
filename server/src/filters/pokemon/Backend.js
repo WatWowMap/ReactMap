@@ -419,6 +419,7 @@ class PkmnBackend {
       expire_timestamp_verified: !!pokemon.expire_timestamp_verified,
       updated: pokemon.updated,
       display_pokemon_id: pokemon.display_pokemon_id,
+      display_pokemon_form: pokemon.display_pokemon_form,
       seen_type: pokemon.seen_type,
       changed: !!pokemon.changed,
       background: pokemon.background,
