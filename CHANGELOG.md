@@ -1,3 +1,10 @@
+# [1.59.0](https://github.com/WatWowMap/ReactMap/compare/v1.58.2...v1.59.0) (2026-11-19)
+
+
+### Features
+
+* **pokemon:** show what the game shows in the popup icon ([cc62811](https://github.com/WatWowMap/ReactMap/commit/cc628117168fc5585bbb2a023b3218d75a709aa1)), closes [#442](https://github.com/WatWowMap/ReactMap/issues/442)
+
 ## [1.58.2](https://github.com/WatWowMap/ReactMap/compare/v1.58.1...v1.58.2) (2026-11-16)
 
 
