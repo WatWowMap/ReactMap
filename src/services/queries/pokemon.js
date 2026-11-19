@@ -16,6 +16,7 @@ const core = gql`
     expire_timestamp_verified
     updated
     display_pokemon_id
+    display_pokemon_form
     seen_type
     background
   }
